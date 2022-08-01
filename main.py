@@ -31,4 +31,20 @@ def get_user_data(user_id):
     }
     response = requests.get(f'{DOMAIN_URL}/services/data/v55.0/sobjects/Contact/{user_id}', headers=headers)
     return json.dumps(json.loads(response.text), indent = 1)
-    
+
+# returns a list of user_ids of all contacts
+def get_all_contact_ids():
+    access_token = get_access_token()
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+    }
+    response = requests.get(f'{DOMAIN_URL}/services/data/v55.0/query/?q=SELECT+Id+FROM+Contact', headers=headers)
+    contacts = json.loads(response.text)['records']
+    return [ contact['Id'] for contact in contacts ]
+
+# returns the details of all the contacts
+def get_all_contact_details():
+    for i in get_all_contact_ids():
+        print(get_user_data(i))
+
+get_all_contact_details()
