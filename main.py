@@ -47,4 +47,13 @@ def get_all_contact_details():
     for i in get_all_contact_ids():
         print(get_user_data(i))
 
-get_all_contact_details()
+# updates the contact details using user_id
+def update_field_values(user_id, updates):
+    access_token = get_access_token()
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json',
+    }
+    data = updates
+    response = requests.patch(f'{DOMAIN_URL}/services/data/v55.0/sobjects/Contact/{user_id}', headers=headers, data=json.dumps(data))
+    return response.text
