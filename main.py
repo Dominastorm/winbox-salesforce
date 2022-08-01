@@ -47,7 +47,7 @@ def get_all_contact_details():
     for i in get_all_contact_ids():
         print(get_user_data(i))
 
-# updates the contact details using user_id
+# updates the contact details using user_id and a dictionary containing the new field name : field value pairs
 def update_field_values(user_id, updates):
     access_token = get_access_token()
     headers = {
