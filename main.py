@@ -57,3 +57,28 @@ def update_field_values(user_id, updates):
     data = updates
     response = requests.patch(f'{DOMAIN_URL}/services/data/v55.0/sobjects/Contact/{user_id}', headers=headers, data=json.dumps(data))
     return response.text
+
+# reads events.json and gets creates/updated emails from it
+def get_updated_emails():
+    events = open('EMP-Connector\events.json', 'r').read().splitlines()
+    events = [json.loads(event) for event in events]
+    emails = []
+
+    for event in events:
+        change_type = event['payload']['ChangeEventHeader']['changeType']
+        if change_type == 'CREATE':
+            if 'Email' in event['payload']:
+                emails.append(event['payload']['Email'])
+            else:
+                # no email field
+                break
+
+        elif change_type == 'UPDATE':
+            if 'Email' in event['payload']['ChangeEventHeader']['changedFields']:
+                # get their user id and print email
+                user_id = event['payload']['ChangeEventHeader']['recordIds'][0]
+                emails.append(json.loads(get_user_data(user_id))['Email'])
+            else:
+                # did not change email
+                break
+    return emails
