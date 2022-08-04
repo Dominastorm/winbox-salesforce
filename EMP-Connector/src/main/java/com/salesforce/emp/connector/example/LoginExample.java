@@ -8,6 +8,8 @@ package com.salesforce.emp.connector.example;
 
 import static com.salesforce.emp.connector.LoginHelper.login;
 
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -29,8 +31,11 @@ import com.salesforce.emp.connector.TopicSubscription;
  */
 public class LoginExample {
 
-    // More than one thread can be used in the thread pool which leads to parallel processing of events which may be acceptable by the application
-    // The main purpose of asynchronous event processing is to make sure that client is able to perform /meta/connect requests which keeps the session alive on the server side
+    // More than one thread can be used in the thread pool which leads to parallel
+    // processing of events which may be acceptable by the application
+    // The main purpose of asynchronous event processing is to make sure that client
+    // is able to perform /meta/connect requests which keeps the session alive on
+    // the server side
     private static final ExecutorService workerThreadPool = Executors.newFixedThreadPool(1);
 
     public static void main(String[] argv) throws Exception {
@@ -53,9 +58,14 @@ public class LoginExample {
             }
         });
 
+        PrintWriter pout = new PrintWriter(new FileOutputStream("events.json", true));
+
         BayeuxParameters params = tokenProvider.login();
 
-        Consumer<Map<String, Object>> consumer = event -> workerThreadPool.submit(() -> System.out.println(String.format("Received:\n%s", JSON.toString(event))));
+        Consumer<Map<String, Object>> consumer = event -> workerThreadPool.submit(() -> {
+            pout.println(JSON.toString(event));
+            pout.flush();
+        });
 
         EmpConnector connector = new EmpConnector(params);
 
