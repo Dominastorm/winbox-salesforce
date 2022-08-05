@@ -87,18 +87,10 @@ def get_updated_emails():
 
 # checks if events.json has been modified since last time. Calls get_updated_emails if it has
 def check_events_file():
-    # check if a file called lastModified exists and write into it the current time if it doesn't exist
     last_modified_file = Path('.') / 'lastModified'
-    if not last_modified_file.exists():
-        last_modified_file.touch()
-        # write current time into lastModified file
-        last_modified_file.write_text(str(datetime.datetime.now()))
-    else:
-        # get last modified time from lastModified file
-        last_modified = datetime.datetime.strptime(last_modified_file.read_text(), '%Y-%m-%d %H:%M:%S.%f').timestamp()
-        print(last_modified)
-        print(os.stat('EMP-Connector\events.json').st_mtime)
-        if last_modified > os.stat('EMP-Connector\events.json').st_mtime:
+    if last_modified_file.exists():
+        last_modified_time = datetime.datetime.strptime(last_modified_file.read_text(), '%Y-%m-%d %H:%M:%S.%f').timestamp()
+        if last_modified_time > os.stat('EMP-Connector\events.json').st_mtime:
             return None
     emails = get_updated_emails()
     # write current time into lastModified file
